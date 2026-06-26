@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart City Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f0f0; padding: 20px; }
+    h1 { text-align: center; color: #333; }
+    .cards { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-bottom: 30px; }
+    .card { background: white; border-radius: 10px; padding: 20px; width: 200px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .card h3 { margin: 0 0 10px; color: #666; font-size: 14px; }
+    .card .value { font-size: 36px; font-weight: bold; color: #333; }
+    .graphs { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+    .prediction { background: white; border-radius: 10px; padding: 20px; text-align: center; margin: 20px auto; max-width: 400px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .prediction h2 { color: #333; }
+    .prediction .pred-value { font-size: 48px; font-weight: bold; color: #4CAF50; }
+  </style>
+</head>
+<body>
+  <h1>🏙️ Smart City – Éclairage & Trafic</h1>
+
+  <div class="cards">
+    <div class="card">
+      <h3>💡 Luminosité</h3>
+      <div class="value" id="ldr">--</div>
+    </div>
+    <div class="card">
+      <h3>🚗 Distance véhicule</h3>
+      <div class="value" id="distance">-- cm</div>
+    </div>
+    <div class="card">
+      <h3>🚶 Mouvement</h3>
+      <div class="value" id="motion">--</div>
+    </div>
+    <div class="card">
+      <h3>🔦 Lampadaire</h3>
+      <div class="value" id="relay">--</div>
+    </div>
+  </div>
+
+  <div class="prediction">
+    <h2>🤖 Prédiction IA (prochaine distance)</h2>
+    <div class="pred-value" id="prediction">--</div>
+    <p style="color:#999">Régression linéaire (Scikit-learn)</p>
+  </div>
+
+  <div class="graphs">
+    <iframe width="450" height="260" style="border:none; border-radius:10px;" src="https://thingspeak.com/channels/3417488/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=30&type=line"></iframe>
+    <iframe width="450" height="260" style="border:none; border-radius:10px;" src="https://thingspeak.com/channels/3417488/charts/2?bgcolor=%23ffffff&color=%232020d6&dynamic=true&results=30&type=line"></iframe>
+    <iframe width="450" height="260" style="border:none; border-radius:10px;" src="https://thingspeak.com/channels/3417488/charts/3?bgcolor=%23ffffff&color=%2320d620&dynamic=true&results=30&type=line"></iframe>
+    <iframe width="450" height="260" style="border:none; border-radius:10px;" src="https://thingspeak.com/channels/3417488/charts/4?bgcolor=%23ffffff&color=%23d68020&dynamic=true&results=30&type=line"></iframe>
+  </div>
+
+  <script>
+    async function updateData() {
+      try {
+        const res = await fetch("http://127.0.0.1:5000/api/data");
+        const data = await res.json();
+        const last = data[data.length - 1];
+        document.getElementById("ldr").textContent = last.field1;
+        document.getElementById("distance").textContent = last.field2 + " cm";
+        document.getElementById("motion").textContent = last.field3 == "1" ? "✅ Oui" : "❌ Non";
+        document.getElementById("relay").textContent = last.field4 == "1" ? "🟡 ON" : "⚫ OFF";
+      } catch(e) { console.error(e); }
+    }
+
+    async function updatePredict() {
+      try {
+        const res = await fetch("http://127.0.0.1:5000/api/predict");
+        const data = await res.json();
+        document.getElementById("prediction").textContent = data.prediction_distance + " cm";
+      } catch(e) { console.error(e); }
+    }
+
+    updateData();
+    updatePredict();
+    setInterval(updateData, 16000);
+    setInterval(updatePredict, 16000);
+  </script>
+</body>
+</html>
