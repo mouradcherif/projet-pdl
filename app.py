@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 CHANNEL_ID = "3417488"
-READ_API_KEY = "1ER37BNIGA9Y5RE6"
+READ_API_KEY = "***"
 
 client = pymongo.MongoClient("mongodb+srv://***:***@projectpdl.o4wmvyv.mongodb.net/?appName=ProjectPDL")
 db = client["smart_city"]
