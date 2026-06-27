@@ -6,7 +6,7 @@ const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
 // --- ThingSpeak ---
-String apiKey = "94FRHFL9JJ14OFM2";
+String apiKey = "***";
 const char* server = "http://api.thingspeak.com/update";
 
 // --- Pins ---
